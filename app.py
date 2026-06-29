@@ -1,5 +1,3 @@
-# app.py
-
 import pandas as pd
 import streamlit as st
 import joblib
@@ -293,7 +291,7 @@ elif page == "Machine Learning":
 # --------------------------------------------------
 
 elif page == "Live Prediction":
-    st.title("🔮 Live Prediction")
+    st.title("Live Prediction")
 
     st.write("""
     Enter general job information below and let the model predict whether this job is likely to grow or not.
@@ -338,7 +336,7 @@ if st.button("Predict Job Growth"):
     if prediction == "Growing":
         st.success("This job is predicted to grow.")
     else:
-        st.warning("This job is predicted to be stable or declining.")
+        st.warning("This job is predicted to be stable or slightly at the risk of a decline.")
 
     st.write(f"Predicted class: **{prediction}**")
     st.write(f"Model confidence: **{confidence:.1f}%**")
