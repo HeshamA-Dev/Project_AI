@@ -15,13 +15,19 @@ st.set_page_config(
 # Load data and model
 # --------------------------------------------------
 
-DATA_PATH = "data/cleaned/ai_job_market_insights_cleaned.csv"
+RAW_DATA_PATH = "data/raw/ai_job_market_insights.csv"
+CLEANED_DATA_PATH = "data/cleaned/ai_job_market_insights_cleaned.csv"
 MODEL_PATH = "model/job_growth_model.pkl"
 
 
 @st.cache_data
-def load_data():
-    return pd.read_csv(DATA_PATH)
+def load_raw_data():
+    return pd.read_csv(RAW_DATA_PATH)
+
+
+@st.cache_data
+def load_cleaned_data():
+    return pd.read_csv(CLEANED_DATA_PATH)
 
 
 @st.cache_resource
@@ -29,8 +35,10 @@ def load_model():
     return joblib.load(MODEL_PATH)
 
 
-df = load_data()
+raw_df = load_raw_data()
+df = load_cleaned_data()
 model = load_model()
+
 
 
 # --------------------------------------------------
@@ -76,7 +84,7 @@ if page == "1. Project Kickoff":
     - Not Growing
     """)
 
-    st.subheader("Project Workflow")
+    st.subheader("My Project Workflow")
 
     st.write("""
     1. Load and understand the dataset  
@@ -104,23 +112,40 @@ elif page == "2. Dataset Exploration":
     st.title("Dataset Overview")
 
     st.write("""
-    The dataset contains job market information related to artificial intelligence, automation risk,
-    required skills, salary, remote work, and job growth.
+    This page shows the original dataset and the cleaned version used for visualization and machine learning.
     """)
 
-    st.subheader("Dataset Shape")
+    st.subheader("Dataset Comparison")
 
-    st.write(f"Rows: {df.shape[0]}")
-    st.write(f"Columns: {df.shape[1]}")
+    c1, c2 = st.columns(2)
 
-    st.subheader("Dataset Preview")
-    st.dataframe(df.head())
+    with c1:
+        st.metric("Raw Dataset Rows", raw_df.shape[0])
+        st.metric("Raw Dataset Columns", raw_df.shape[1])
 
-    st.subheader("Columns")
-    st.write(list(df.columns))
+    with c2:
+        st.metric("Cleaned Dataset Rows", df.shape[0])
+        st.metric("Cleaned Dataset Columns", df.shape[1])
 
-    st.subheader("Missing Values")
-    st.dataframe(df.isnull().sum().to_frame(name="Missing Values"))
+    tab1, tab2 = st.tabs([
+        "Raw Data Preview",
+        "Cleaned Data Preview"
+    ])
+
+    with tab1:
+        st.subheader("Raw Dataset Preview")
+        st.write("""
+        This is the original dataset before applying the cleaning pipeline.
+        """)
+        st.dataframe(raw_df.head(10), use_container_width=True)
+
+    with tab2:
+        st.subheader("Cleaned Dataset Preview")
+        st.write("""
+        This is the cleaned dataset after applying the data cleaning steps.
+        """)
+        st.dataframe(df.head(10), use_container_width=True)
+
 
 
 # --------------------------------------------------
