@@ -42,12 +42,12 @@ st.sidebar.title("Navigation")
 page = st.sidebar.radio(
     "Go to",
     [
-        "Home",
-        "Dataset",
-        "Data Cleaning",
-        "Visualizations",
-        "Machine Learning",
-        "Live Prediction"
+    "1. Project Kickoff",
+    "2. Dataset Exploration",
+    "3. Data Cleaning Protocol",
+    "4. Visualizations",
+    "5. Machine Learning",
+    "6. Live Prediction"
     ]
 )
 
@@ -56,7 +56,7 @@ page = st.sidebar.radio(
 # Home page
 # --------------------------------------------------
 
-if page == "Home":
+if page == "1. Project Kickoff":
     st.title(" AI Job Impact Predictor")
 
     st.write("""
@@ -85,13 +85,22 @@ if page == "Home":
     4. Train a scikit-learn classification model  
     5. Use the model in a Streamlit app for live predictions  
     """)
+    
+    st.subheader("Technical Dataset Overview")
+
+    c1, c2, c3, c4 = st.columns(4)
+
+    c1.metric("Rows", df.shape[0])
+    c2.metric("Columns", df.shape[1])
+    c3.metric("Missing Values", int(df.isnull().sum().sum()))
+    c4.metric("Model Accuracy", "56%")
 
 
 # --------------------------------------------------
 # Dataset page
 # --------------------------------------------------
 
-elif page == "Dataset":
+elif page == "2. Dataset Exploration":
     st.title("Dataset Overview")
 
     st.write("""
@@ -118,61 +127,135 @@ elif page == "Dataset":
 # Data Cleaning page
 # --------------------------------------------------
 
-elif page == "Data Cleaning":
-    st.title("Data Cleaning Pipeline")
+elif page == "3. Data Cleaning Protocol":
+    st.title("Data Cleaning Protocol")
 
     st.write("""
-    The data cleaning process prepared the dataset for analysis and machine learning.
+    This page summarizes the main cleaning steps that were applied to the raw dataset.
+    Each step shows what was checked and what the final result was.
     """)
 
-    st.subheader("Cleaning Steps")
+    st.subheader("Cleaning Overview")
 
-    st.write("""
-    - Checked missing values
-    - Checked duplicate rows
-    - Cleaned categorical text values
-    - Converted salary values from float to integer
-    - Converted Remote_Friendly from Yes/No to 1/0
-    - Checked possible salary outliers
-    - Saved the cleaned dataset as a new CSV file
-    """)
+    with st.expander("1. Missing Values Check", expanded=True):
+        missing_values = df.isnull().sum().sum()
 
-    st.subheader("Optimizations")
+        st.write("The dataset was checked for missing values in all columns.")
 
-    st.write("""
-    Salary values were rounded and converted to integers because salary values do not need decimal places
-    for this project.
-    """)
+        if missing_values == 0:
+            st.success("Result: No missing values were found.")
+        else:
+            st.warning(f"Result: {missing_values} missing values were found.")
 
-    st.write("""
-    Remote_Friendly was converted into a binary variable:
-    """)
+        st.dataframe(df.isnull().sum().to_frame(name="Missing Values"))
 
-    st.write("""
-    - Yes = 1
-    - No = 0
-    """)
+    with st.expander("2. Duplicate Rows Check", expanded=True):
+        duplicate_rows = df.duplicated().sum()
 
-    st.subheader("Remote-Friendly Percentage")
+        st.write("The dataset was checked for duplicate rows.")
 
-    remote_table = df["Remote_Friendly"].map({
-        1: "Yes",
-        0: "No"
-    }).value_counts(normalize=True) * 100
+        if duplicate_rows == 0:
+            st.success("Result: No duplicate rows were found.")
+        else:
+            st.warning(f"Result: {duplicate_rows} duplicate rows were found.")
 
-    remote_table = remote_table.round(1).to_frame(name="Percentage (%)")
+    with st.expander("3. Salary Data Type Conversion", expanded=True):
+        st.write("""
+        The column `Salary_USD` was converted from float to integer.
+        Salary values were rounded before converting them to avoid simply cutting off decimal values.
+        """)
 
-    st.dataframe(remote_table)
+        st.success("Result: Salary_USD was rounded and converted to integer values.")
+
+        st.code('df_clean["Salary_USD"] = df_clean["Salary_USD"].round().astype(int)')
+
+    with st.expander("4. Remote_Friendly Conversion", expanded=True):
+        st.write("""
+        The column `Remote_Friendly` originally contained `Yes` and `No`.
+        It was converted into a binary format for easier analysis and machine learning.
+        """)
+
+        st.write("""
+        - Yes = 1
+        - No = 0
+        """)
+
+        st.success("Result: Remote_Friendly was converted from Yes/No into 1/0.")
+
+        remote_table = df["Remote_Friendly"].map({
+            1: "Yes",
+            0: "No"
+        }).value_counts(normalize=True) * 100
+
+        remote_table = remote_table.round(1).to_frame(name="Percentage (%)")
+
+        st.dataframe(remote_table)
+
+    with st.expander("5. Salary Outlier Check", expanded=True):
+        st.write("""
+        The salary column was checked for possible outliers using the IQR method.
+        This method identifies unusually low or high values compared to the main salary distribution.
+        """)
+
+        q1 = df["Salary_USD"].quantile(0.25)
+        q3 = df["Salary_USD"].quantile(0.75)
+        iqr = q3 - q1
+
+        lower_bound = q1 - 1.5 * iqr
+        upper_bound = q3 + 1.5 * iqr
+
+        outliers = df[
+            (df["Salary_USD"] < lower_bound) |
+            (df["Salary_USD"] > upper_bound)
+        ]
+
+        st.write(f"Q1: {q1:.2f}")
+        st.write(f"Q3: {q3:.2f}")
+        st.write(f"IQR: {iqr:.2f}")
+        st.write(f"Lower bound: {lower_bound:.2f}")
+        st.write(f"Upper bound: {upper_bound:.2f}")
+
+        st.write(f"Possible salary outliers found: {len(outliers)}")
+
+        st.success("""
+        Result: Possible salary outliers were checked but not removed,
+        because high or low salaries can still be realistic depending on job title,
+        location, company size, industry, or experience level.
+        """)
+
+    with st.expander("6. Final Cleaned Dataset", expanded=True):
+        st.write("""
+        After cleaning, the dataset was saved as a new CSV file and used for visualization,
+        machine learning, and the Streamlit application.
+        """)
+
+        st.success(f"Result: Final dataset contains {df.shape[0]} rows and {df.shape[1]} columns.")
+
+        st.dataframe(df.head())
 
 
 # --------------------------------------------------
 # Visualizations page
 # --------------------------------------------------
 
-elif page == "Visualizations":
+elif page == "4. Visualizations":
     st.title("Visualizations")
 
+    st.write("""
+    This page shows the most important visualizations from the dataset.
+    The charts help explain salary distribution, automation risk, job growth, and the relationship between AI adoption and job growth.
+    """)
+
+    # --------------------------------------------------
+    # 1. Salary Distribution
+    # --------------------------------------------------
+
     st.subheader("Salary Distribution")
+
+    st.write("""
+    This histogram shows how salaries are distributed in the dataset.
+    It helps identify common salary ranges and possible unusually high or low salary values.
+    """)
 
     fig, ax = plt.subplots(figsize=(10, 6))
     ax.hist(df["Salary_USD"], bins=20, edgecolor="black")
@@ -182,48 +265,83 @@ elif page == "Visualizations":
 
     st.pyplot(fig)
 
+    # --------------------------------------------------
+    # 2. Automation Risk Distribution
+    # --------------------------------------------------
+
     st.subheader("Automation Risk Distribution")
+
+    st.write("""
+    This chart shows how many jobs have low, medium, or high automation risk.
+    This is important because automation risk is directly connected to the topic of AI and jobs.
+    """)
 
     risk_counts = df["Automation_Risk"].value_counts()
 
     fig2, ax2 = plt.subplots(figsize=(8, 5))
-    risk_counts.plot(kind="bar", ax=ax2)
+    risk_counts.plot(kind="bar", ax=ax2, edgecolor="black")
     ax2.set_title("Automation Risk Distribution")
     ax2.set_xlabel("Automation Risk")
     ax2.set_ylabel("Number of Jobs")
+    ax2.tick_params(axis="x", rotation=0)
 
     st.pyplot(fig2)
 
-    st.subheader("Average Salary by Industry")
-
-    salary_by_industry = df.groupby("Industry")["Salary_USD"].mean().sort_values()
-
-    fig3, ax3 = plt.subplots(figsize=(10, 6))
-    salary_by_industry.plot(kind="barh", ax=ax3)
-    ax3.set_title("Average Salary by Industry")
-    ax3.set_xlabel("Average Salary in USD")
-    ax3.set_ylabel("Industry")
-
-    st.pyplot(fig3)
+    # --------------------------------------------------
+    # 3. Job Growth Distribution
+    # --------------------------------------------------
 
     st.subheader("Job Growth Distribution")
 
+    st.write("""
+    This chart shows the distribution of the original job growth categories.
+    This is especially important because job growth is the target variable for the machine learning model.
+    """)
+
     growth_counts = df["Job_Growth_Projection"].value_counts()
 
-    fig4, ax4 = plt.subplots(figsize=(8, 5))
-    growth_counts.plot(kind="bar", ax=ax4)
-    ax4.set_title("Job Growth Projection Distribution")
-    ax4.set_xlabel("Job Growth Projection")
-    ax4.set_ylabel("Number of Jobs")
+    fig3, ax3 = plt.subplots(figsize=(8, 5))
+    growth_counts.plot(kind="bar", ax=ax3, edgecolor="black")
+    ax3.set_title("Job Growth Projection Distribution")
+    ax3.set_xlabel("Job Growth Projection")
+    ax3.set_ylabel("Number of Jobs")
+    ax3.tick_params(axis="x", rotation=0)
+
+    st.pyplot(fig3)
+
+    # --------------------------------------------------
+    # 4. Job Growth by AI Adoption Level
+    # --------------------------------------------------
+
+    st.subheader("Job Growth Projection by AI Adoption Level")
+
+    st.write("""
+    This chart compares job growth categories across different AI adoption levels.
+    It helps analyze whether jobs in environments with higher AI adoption show different growth patterns.
+    """)
+
+    ai_growth_table = pd.crosstab(
+        df["AI_Adoption_Level"],
+        df["Job_Growth_Projection"],
+        normalize="index"
+    ) * 100
+
+    fig4, ax4 = plt.subplots(figsize=(10, 6))
+    ai_growth_table.plot(kind="bar", ax=ax4, edgecolor="black")
+
+    ax4.set_title("Job Growth Projection by AI Adoption Level")
+    ax4.set_xlabel("AI Adoption Level")
+    ax4.set_ylabel("Percentage (%)")
+    ax4.tick_params(axis="x", rotation=0)
+    ax4.legend(title="Job Growth Projection")
 
     st.pyplot(fig4)
-
-
+    
 # --------------------------------------------------
 # Machine Learning page
 # --------------------------------------------------
 
-elif page == "Machine Learning":
+elif page == "5. Machine Learning":
     st.title("Machine Learning Model")
 
     st.write("""
@@ -290,7 +408,7 @@ elif page == "Machine Learning":
 # Live Prediction page
 # --------------------------------------------------
 
-elif page == "Live Prediction":
+elif page == "6. Live Prediction":
     st.title("Live Prediction")
 
     st.write("""
@@ -323,20 +441,20 @@ elif page == "Live Prediction":
     st.subheader("Input Data")
     st.dataframe(input_data)
 
-if st.button("Predict Job Growth"):
-    prediction = model.predict(input_data)[0]
+    if st.button("Predict Job Growth"):
+        prediction = model.predict(input_data)[0]
 
-    prediction_proba = model.predict_proba(input_data)[0]
-    class_names = model.classes_
+        prediction_proba = model.predict_proba(input_data)[0]
+        class_names = model.classes_
 
-    confidence = prediction_proba[class_names.tolist().index(prediction)] * 100
+        confidence = prediction_proba[class_names.tolist().index(prediction)] * 100
 
-    st.subheader("Prediction Result")
+        st.subheader("Prediction Result")
 
-    if prediction == "Growing":
-        st.success("This job is predicted to grow.")
-    else:
-        st.warning("This job is predicted to be stable or slightly at the risk of a decline.")
+        if prediction == "Growing":
+            st.success("This job is predicted to grow.")
+        else:
+            st.warning("This job is predicted to be stable or slightly at the risk of a decline.")
 
-    st.write(f"Predicted class: **{prediction}**")
-    st.write(f"Model confidence: **{confidence:.1f}%**")
+        st.write(f"Predicted class: **{prediction}**")
+        st.write(f"Model confidence: **{confidence:.1f}%**")
