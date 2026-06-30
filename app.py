@@ -55,7 +55,8 @@ page = st.sidebar.radio(
     "3. Data Cleaning Protocol",
     "4. Visualizations",
     "5. Machine Learning",
-    "6. Live Prediction"
+    "6. Live Prediction",
+    "7. Conclusion"
     ]
 )
 
@@ -162,7 +163,7 @@ elif page == "3. Data Cleaning Protocol":
 
     st.subheader("Cleaning Overview")
 
-    with st.expander("1. Missing Values Check", expanded=True):
+    with st.expander("1. Missing Values Check", expanded=False):
         missing_values = df.isnull().sum().sum()
 
         st.write("The dataset was checked for missing values in all columns.")
@@ -174,7 +175,7 @@ elif page == "3. Data Cleaning Protocol":
 
         st.dataframe(df.isnull().sum().to_frame(name="Missing Values"))
 
-    with st.expander("2. Duplicate Rows Check", expanded=True):
+    with st.expander("2. Duplicate Rows Check", expanded=False):
         duplicate_rows = df.duplicated().sum()
 
         st.write("The dataset was checked for duplicate rows.")
@@ -184,7 +185,7 @@ elif page == "3. Data Cleaning Protocol":
         else:
             st.warning(f"Result: {duplicate_rows} duplicate rows were found.")
 
-    with st.expander("3. Salary Data Type Conversion", expanded=True):
+    with st.expander("3. Salary Data Type Conversion", expanded=False):
         st.write("""
         The column `Salary_USD` was converted from float to integer.
         Salary values were rounded before converting them to avoid simply cutting off decimal values.
@@ -192,9 +193,8 @@ elif page == "3. Data Cleaning Protocol":
 
         st.success("Result: Salary_USD was rounded and converted to integer values.")
 
-        st.code('df_clean["Salary_USD"] = df_clean["Salary_USD"].round().astype(int)')
 
-    with st.expander("4. Remote_Friendly Conversion", expanded=True):
+    with st.expander("4. Remote_Friendly Conversion", expanded=False):
         st.write("""
         The column `Remote_Friendly` originally contained `Yes` and `No`.
         It was converted into a binary format for easier analysis and machine learning.
@@ -216,7 +216,7 @@ elif page == "3. Data Cleaning Protocol":
 
         st.dataframe(remote_table)
 
-    with st.expander("5. Salary Outlier Check", expanded=True):
+    with st.expander("5. Salary Outlier Check", expanded=False):
         st.write("""
         The salary column was checked for possible outliers using the IQR method.
         This method identifies unusually low or high values compared to the main salary distribution.
@@ -248,7 +248,7 @@ elif page == "3. Data Cleaning Protocol":
         location, company size, industry, or experience level.
         """)
 
-    with st.expander("6. Final Cleaned Dataset", expanded=True):
+    with st.expander("6. Final Cleaned Dataset", expanded=False):
         st.write("""
         After cleaning, the dataset was saved as a new CSV file and used for visualization,
         machine learning, and the Streamlit application.
@@ -365,25 +365,29 @@ elif page == "4. Visualizations":
 # --------------------------------------------------
 # Machine Learning page
 # --------------------------------------------------
-
 elif page == "5. Machine Learning":
     st.title("Machine Learning Model")
 
     st.write("""
-    The machine learning task is a classification problem.
+    The machine learning part of this project is a supervised classification task.
     The goal is to predict whether a job is likely to grow or not.
     """)
 
-    st.subheader("Target Variable")
+    st.subheader("Prediction Target")
 
     st.write("""
-    The original target variable is:
+    The original target column was `Job_Growth_Projection`.
+    It originally contained three values:
     """)
 
-    st.code("Job_Growth_Projection")
+    st.write("""
+    - Growth
+    - Stable
+    - Decline
+    """)
 
     st.write("""
-    For the model, the target was converted into a binary variable:
+    For the model, this target was converted into a binary variable:
     """)
 
     st.write("""
@@ -392,10 +396,10 @@ elif page == "5. Machine Learning":
     - Decline = Not Growing
     """)
 
-    st.subheader("Model Features")
+    st.subheader("Input Features")
 
     st.write("""
-    The model uses these input features:
+    The model uses the following features:
     """)
 
     st.write("""
@@ -420,13 +424,35 @@ elif page == "5. Machine Learning":
     - Industry was removed because similar jobs can exist across many different industries.
     """)
 
-    st.subheader("Model")
+    st.subheader("Algorithm")
 
     st.write("""
-    A RandomForestClassifier from scikit-learn was used.
-    Categorical columns were encoded using OneHotEncoder.
-    The preprocessing and model were combined in a scikit-learn Pipeline.
+    I used a Random Forest Classifier from scikit-learn.
+    A Random Forest combines many decision trees. In this project, the model uses 100 decision trees.
+    Each tree makes a prediction, and the final result is based on majority voting.
     """)
+
+    st.subheader("Preprocessing")
+
+    st.write("""
+    Most input features are categorical, so they were converted into numerical values using OneHotEncoder.
+    The preprocessing step and the Random Forest model were combined in a scikit-learn Pipeline.
+    """)
+
+    st.subheader("Evaluation")
+
+    st.write("""
+    The dataset was split using an 80/20 train-test split.
+    This means that 80% of the data was used for training and 20% was used for testing.
+    """)
+
+    st.metric("Model Accuracy", "56%")
+
+    st.write("""
+    The classification report showed that the model predicted `Not Growing` better than `Growing`.
+    One reason is that the dataset is imbalanced: there are more `Not Growing` examples than `Growing` examples.
+    """)
+
 
 
 # --------------------------------------------------
