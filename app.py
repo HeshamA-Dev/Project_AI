@@ -55,8 +55,7 @@ page = st.sidebar.radio(
     "3. Data Cleaning Protocol",
     "4. Visualizations",
     "5. Machine Learning",
-    "6. Live Prediction",
-    "7. Conclusion"
+    "6. Live Prediction"
     ]
 )
 
@@ -66,7 +65,7 @@ page = st.sidebar.radio(
 # --------------------------------------------------
 
 if page == "1. Project Kickoff":
-    st.title(" AI Job Impact Predictor")
+    st.title("AI Job Impact Predictor")
 
     st.write("""
     This project analyzes job market data and predicts whether a job is likely to grow in the future.
@@ -85,7 +84,7 @@ if page == "1. Project Kickoff":
     - Not Growing
     """)
 
-    st.subheader("My Project Workflow")
+    st.subheader("My Project Roadmap")
 
     st.write("""
     1. Load and understand the dataset  
@@ -104,6 +103,12 @@ if page == "1. Project Kickoff":
     c3.metric("Missing Values", int(df.isnull().sum().sum()))
     c4.metric("Model Accuracy", "56%")
 
+    st.subheader("Project Links")
+
+    st.markdown("""
+    - [GitHub Repository](https://github.com/HeshamA-Dev/Project_AI)
+    - [Dataset Source](https://www.kaggle.com/datasets/uom190346a/ai-powered-job-market-insights?resource=download)
+    """)
 
 # --------------------------------------------------
 # Dataset page
