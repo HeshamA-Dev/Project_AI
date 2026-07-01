@@ -338,34 +338,6 @@ elif page == "4. Visualizations":
     ax3.tick_params(axis="x", rotation=0)
 
     st.pyplot(fig3)
-
-    # --------------------------------------------------
-    # 4. Job Growth by AI Adoption Level
-    # --------------------------------------------------
-
-    st.subheader("Job Growth Projection by AI Adoption Level")
-
-    st.write("""
-    This chart compares job growth categories across different AI adoption levels.
-    It helps analyze whether jobs in environments with higher AI adoption show different growth patterns.
-    """)
-
-    ai_growth_table = pd.crosstab(
-        df["AI_Adoption_Level"],
-        df["Job_Growth_Projection"],
-        normalize="index"
-    ) * 100
-
-    fig4, ax4 = plt.subplots(figsize=(10, 6))
-    ai_growth_table.plot(kind="bar", ax=ax4, edgecolor="black")
-
-    ax4.set_title("Job Growth Projection by AI Adoption Level")
-    ax4.set_xlabel("AI Adoption Level")
-    ax4.set_ylabel("Percentage (%)")
-    ax4.tick_params(axis="x", rotation=0)
-    ax4.legend(title="Job Growth Projection")
-
-    st.pyplot(fig4)
     
 # --------------------------------------------------
 # Machine Learning page
