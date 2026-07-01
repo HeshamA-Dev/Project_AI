@@ -409,12 +409,6 @@ elif page == "5. Machine Learning":
     Each tree makes a prediction, and the final result is based on majority voting.
     """)
 
-    st.subheader("Preprocessing")
-
-    st.write("""
-    Most input features are categorical, so they were converted into numerical values using OneHotEncoder.
-    The preprocessing step and the Random Forest model were combined in a scikit-learn Pipeline.
-    """)
 
     st.subheader("Evaluation")
 
