@@ -65,7 +65,7 @@ page = st.sidebar.radio(
 # --------------------------------------------------
 
 if page == "1. Project Kickoff":
-    st.title("AI Job Impact Predictor")
+    st.title("AI Job Predictor")
 
     st.write("""
     This project analyzes job market data and predicts whether a job is likely to grow in the future.
@@ -344,11 +344,6 @@ elif page == "4. Visualizations":
 # --------------------------------------------------
 elif page == "5. Machine Learning":
     st.title("Machine Learning Model")
-
-    st.write("""
-    The machine learning part of this project is a supervised classification task.
-    The goal is to predict whether a job is likely to grow or not.
-    """)
 
     st.subheader("Prediction Target")
 
